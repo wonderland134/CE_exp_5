@@ -34,7 +34,6 @@ class analize():
     def calc_all(self):
         for f in self.file_list:
             trial = Process_data(f, self.path) 
-            print(trial.data_file.shape[0])
             '''
             #역동작 시간통일 시 주석 해제
             trial.data_file = trial.data_file.loc[range(0,37), :]
@@ -57,12 +56,16 @@ class analize():
     
     def data_plot(self):
         plt.close()
-        for data_set in self.raw_data:
+        color_chart = ['b', 'g', 'r', 'y']
+        for i, data_set in enumerate(self.raw_data):
+            #제어출력도 plot하기 원하면 밑의 주석 해제
             t_array = data_set.data_file['실험시간']
             p_array = data_set.data_file['현재압력']
+            #control_array = data_set.data_file['제어출력[%]']/100
             p_array_set = data_set.data_file['설정압력']
             name = f'{data_set.type_} P:{data_set.p},I:{data_set.i},D:{data_set.d}, num:{data_set.index_}'
-            plt.plot(t_array, p_array, label = name)
+            plt.plot(t_array, p_array, color_chart[i], label = name)
+            #plt.plot(t_array, control_array, color_chart[i]+':', label = f'{name}, Control')
             plt.plot(t_array, p_array_set, 'k:')
         plt.grid()
         plt.legend()
@@ -341,7 +344,7 @@ if __name__ == '__main__':
     print(c_c)
     '''
     
-    '''
+
     data_sample0 = analize('B ONOFF')
     data_sample0.calc_all()
     data_sample0.save_result()
@@ -381,4 +384,3 @@ if __name__ == '__main__':
     data_sample7.calc_all()
     data_sample7.save_result()
     data_sample7.data_plot()
-    '''
