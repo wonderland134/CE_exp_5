@@ -28,26 +28,26 @@ class analize():
         self.result_path = path + '/result'
         self.path = path + f'/{self.folder}'
 
-        self.result = pd.DataFrame(columns = ['Type', 'P', 'I', 'D', 'index', 'IAE', 'ISE', 'ITAE', 'ITSE'])
+        self.result = pd.DataFrame(columns = ['Type', 'P', 'I', 'D', 'IAE', 'ISE', 'ITAE', 'ITSE'])
         self.raw_data = []
 
     def calc_all(self):
         for f in self.file_list:
             trial = Process_data(f, self.path) 
+            
             '''
             #역동작 시간통일 시 주석 해제
             trial.data_file = trial.data_file.loc[range(0,37), :]
             '''
-            
             '''
             #정동작 시간통일 시 주석 해제
             trial.data_file = trial.data_file.loc[range(0,51), :]
             '''
-
+            print(trial.data_file.shape[0])
             self.raw_data.append(trial)
 
             err = trial.calc_err()
-            data = {'Type' : trial.type_, 'P' : trial.p, 'I' : trial.i, 'D' : trial.d, 'index' : trial.index_,\
+            data = {'Type' : trial.type_, 'P' : trial.p, 'I' : trial.i, 'D' : trial.d,\
                 'IAE' : err['IAE'], 'ISE' : err['ISE'], 'ITAE' : err['ITAE'], 'ITSE' : err['ITSE']}
             self.result = self.result.append(data, ignore_index = True)
 
@@ -63,10 +63,11 @@ class analize():
             p_array = data_set.data_file['현재압력']
             #control_array = data_set.data_file['제어출력[%]']/100
             p_array_set = data_set.data_file['설정압력']
-            name = f'{data_set.type_} P:{data_set.p},I:{data_set.i},D:{data_set.d}, num:{data_set.index_}'
+            name = f'{data_set.type_} P:{data_set.p},I:{data_set.i},D:{data_set.d}'
             plt.plot(t_array, p_array, color_chart[i], label = name)
             #plt.plot(t_array, control_array, color_chart[i]+':', label = f'{name}, Control')
             plt.plot(t_array, p_array_set, 'k:')
+            
         plt.grid()
         plt.legend()
         plt.xlabel('time (s)')
@@ -84,19 +85,16 @@ class Process_data():
             self.p = data[1]
             self.i = data[2]
             self.d = data[3]
-            self.index_ = 1
         elif len(data) == 5:
             self.type_ = data[0]
             self.p = data[1]
             self.i = data[2]
             self.d = data[3]
-            self.index_ = data[4]
         elif len(data) == 2:
             self.type_ = 'ONOFF'
             self.p = '-'
             self.i = '-'
             self.d = '-'
-            self.index_ = 1
 
         self.data_file = pd.read_csv(f'{path}/{file_name}', header = 3)
         self.data_file = self.refine_time_data(self.data_file)
@@ -343,44 +341,136 @@ if __name__ == '__main__':
     c_c.to_excel('cc.xlsx')
     print(c_c)
     '''
-    
 
-    data_sample0 = analize('B ONOFF')
+    data_sample0 = analize('B P=4')
     data_sample0.calc_all()
     data_sample0.save_result()
     data_sample0.data_plot()
 
-    data_sample1 = analize('B P=4')
+    data_sample1 = analize('B P=4, I=0.1')
     data_sample1.calc_all()
     data_sample1.save_result()
     data_sample1.data_plot()
 
-    data_sample2 = analize('B P=8')
+    data_sample2 = analize('B P=4, I=0.2')
     data_sample2.calc_all()
     data_sample2.save_result()
     data_sample2.data_plot()
 
-    data_sample3 = analize('B P=12')
+    data_sample3 = analize('B P=4, I=0.3')
     data_sample3.calc_all()
     data_sample3.save_result()
     data_sample3.data_plot()
     
-    data_sample4 = analize('F ONOFF')
+    data_sample4 = analize('B P=8')
     data_sample4.calc_all()
     data_sample4.save_result()
     data_sample4.data_plot()
 
-    data_sample5 = analize('F P=4')
+    data_sample5 = analize('B P=8, I=0.1')
     data_sample5.calc_all()
     data_sample5.save_result()
     data_sample5.data_plot()
 
-    data_sample6 = analize('F P=8')
+    data_sample6 = analize('B P=8, I=0.2')
     data_sample6.calc_all()
     data_sample6.save_result()
     data_sample6.data_plot()
 
-    data_sample7 = analize('F P=12')
+    data_sample7 = analize('B P=8, I=0.3')
     data_sample7.calc_all()
     data_sample7.save_result()
     data_sample7.data_plot()
+    
+    data_sample8 = analize('B P=12')
+    data_sample8.calc_all()
+    data_sample8.save_result()
+    data_sample8.data_plot()
+
+    data_sample9 = analize('B P=12, I=0.1')
+    data_sample9.calc_all()
+    data_sample9.save_result()
+    data_sample9.data_plot()
+
+    data_sample10 = analize('B P=12, I=0.2')
+    data_sample10.calc_all()
+    data_sample10.save_result()
+    data_sample10.data_plot()
+
+    data_sample11 = analize('B P=12, I=0.3')
+    data_sample11.calc_all()
+    data_sample11.save_result()
+    data_sample11.data_plot()
+
+    data_sample12 = analize('B ONOFF')
+    data_sample12.calc_all()
+    data_sample12.save_result()
+    data_sample12.data_plot()
+
+
+    
+    data_sample0 = analize('F P=4')
+    data_sample0.calc_all()
+    data_sample0.save_result()
+    data_sample0.data_plot()
+
+    data_sample1 = analize('F P=4, I=0.1')
+    data_sample1.calc_all()
+    data_sample1.save_result()
+    data_sample1.data_plot()
+
+    data_sample2 = analize('F P=4, I=0.2')
+    data_sample2.calc_all()
+    data_sample2.save_result()
+    data_sample2.data_plot()
+
+    data_sample3 = analize('F P=4, I=0.3')
+    data_sample3.calc_all()
+    data_sample3.save_result()
+    data_sample3.data_plot()
+    
+    data_sample4 = analize('F P=8')
+    data_sample4.calc_all()
+    data_sample4.save_result()
+    data_sample4.data_plot()
+
+    data_sample5 = analize('F P=8, I=0.1')
+    data_sample5.calc_all()
+    data_sample5.save_result()
+    data_sample5.data_plot()
+
+    data_sample6 = analize('F P=8, I=0.2')
+    data_sample6.calc_all()
+    data_sample6.save_result()
+    data_sample6.data_plot()
+
+    data_sample7 = analize('F P=8, I=0.3')
+    data_sample7.calc_all()
+    data_sample7.save_result()
+    data_sample7.data_plot()
+    
+    data_sample8 = analize('F P=12')
+    data_sample8.calc_all()
+    data_sample8.save_result()
+    data_sample8.data_plot()
+
+    data_sample9 = analize('F P=12, I=0.1')
+    data_sample9.calc_all()
+    data_sample9.save_result()
+    data_sample9.data_plot()
+
+    data_sample10 = analize('F P=12, I=0.2')
+    data_sample10.calc_all()
+    data_sample10.save_result()
+    data_sample10.data_plot()
+
+    data_sample11 = analize('F P=12, I=0.3')
+    data_sample11.calc_all()
+    data_sample11.save_result()
+    data_sample11.data_plot()
+
+    data_sample12 = analize('F ONOFF')
+    data_sample12.calc_all()
+    data_sample12.save_result()
+    data_sample12.data_plot()
+    
