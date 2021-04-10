@@ -20,6 +20,7 @@ class calculation():
         self.name = file_name[0:-4]
         self.conc_convert = False
         self.RTD_data = None
+        self.fitted_data = None
 
     def conductance_to_conc(self):
         min_max_info = []
@@ -63,7 +64,7 @@ class calculation():
         E_1 = self.RTD_data['RTD_E1']
         E_2 = self.RTD_data['RTD_E2']
         E_3 = self.RTD_data['RTD_E3']
-        t_array = self.data['t']
+        t_array = self.fitted_data['t']
         
         tE_1 = t_array * E_1
         tE_2 = t_array * E_2
@@ -90,12 +91,12 @@ class calculation():
 
         CB = 0.02
 
-        t_array = self.data['t']
+        t_array = self.fitted_data['t']
 
         c0_array = np.zeros_like(t_array) + CB
-        c1_array = self.data['tank1']
-        c2_array = self.data['tank2']
-        c3_array = self.data['tank3']
+        c1_array = self.fitted_data['C1']
+        c2_array = self.fitted_data['C2']
+        c3_array = self.fitted_data['C3']
 
         E1_array = np.zeros_like(c1_array)
         E2_array = np.zeros_like(c2_array)
@@ -126,7 +127,7 @@ class calculation():
         plt.plot(t_array, E3_array, 'b-', label = 'tank3 RTD')
         plt.xlabel('time(min)')
         plt.ylabel('RTD')
-        plt.title('RTD for each tank')
+        plt.title(f'RTD for each tank, {self.name}')
         plt.grid()
         plt.legend()
         plt.show()
@@ -196,7 +197,7 @@ class calculation():
         print(tau3)
 
         max_time = self.data['t'][self.data.shape[0]-1]
-        t_array = np.linspace(0,max_time,100)
+        t_array = np.linspace(0,max_time,500)
         
         C1_array = CB*(1-np.exp(-t_array/tau1))+C0*np.exp(-t_array/tau1)
         C2_array = CB/(tau1-tau2)*(tau1*(1-np.exp(-t_array/tau1))+tau2*(np.exp(-t_array/tau2)-1))+\
@@ -206,6 +207,9 @@ class calculation():
                 C0/(tau2*tau3)*(tau1**2*tau2*tau3*np.exp(-t_array/tau1)/((tau1-tau2)*(tau1-tau3))-tau1*tau2**2*tau3*np.exp(-t_array/tau2)/((tau1-tau2)*(tau2-tau3))-tau1*tau2*tau3**2*np.exp(-t_array/tau3)/((tau1-tau3)*(tau3-tau2)))+\
                     tau2*C0/(tau2-tau3)*(np.exp(-t_array/tau2)-np.exp(-t_array/tau3))+C0*np.exp(-t_array/tau3)
         
+        fitted_data = {'t' : t_array, 'C1' : C1_array, 'C2' : C2_array, 'C3' : C3_array}
+        self.fitted_data = pd.DataFrame(fitted_data)
+
         plt.close()
         plt.plot(t_array, C1_array, 'r-', label = f'tank1_fit, tau1 = {calc_tool.round_sig(tau1, 4)}')
         plt.plot(t_array, C2_array, 'g-', label = f'tank2_fit, tau2 = {calc_tool.round_sig(tau2, 4)}')
